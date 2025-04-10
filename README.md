@@ -21,5 +21,5 @@
 
 1. Clone the repo:
    ```bash
-   git clone git@github.com:shadow0vortex/vortex_test.git
-   cd vortex_test
+   git clone git@github.com:shadow0vortex/LumoBOT.git
+   cd LumoBOT
