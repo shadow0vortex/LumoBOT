@@ -1,29 +1,27 @@
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
+const FormData = require("form-data");
 
 module.exports = async function generateImage(prompt) {
+  const form = new FormData();
+  form.append("prompt", prompt);
+  form.append("output_format", "png");
+
   const response = await axios.post(
-    "https://api.stability.ai/v1/generation/stable-diffusion-v1-5/text-to-image",
-    {
-      text_prompts: [{ text: prompt }],
-      cfg_scale: 7,
-      height: 512,
-      width: 512,
-      samples: 1,
-      steps: 30,
-    },
+    "https://api.stability.ai/v2beta/stable-image/generate/core",
+    form,
     {
       headers: {
-        Accept: "application/json",
         Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
+        ...form.getHeaders(),
       },
+      responseType: "arraybuffer", // critical for binary image
     }
   );
 
-  const base64Image = response.data.artifacts[0].base64;
   const filePath = path.join(__dirname, "../output.png");
+  fs.writeFileSync(filePath, response.data);
 
-  fs.writeFileSync(filePath, Buffer.from(base64Image, "base64"));
   return filePath;
 };
